@@ -64,40 +64,57 @@ function addWord() {
 }
 addWord();
 
+const value = words.length;
 
 buttonNext.addEventListener("click", function() {
-    if (i < 7) {
-        currentWord.textContent = ++i;
-    }
-    if (i > 1) {
-        buttonBack.disabled = false;
-    }
-    if (i > 6) {
+    currentWord.textContent = ++i;
+    if (i === value) {
         buttonNext.disabled = true;
     }
     addWord();
+    buttonBack.disabled = false;
 })
 
+
 buttonBack.addEventListener("click", function() {
-    if (i > 1) {
-        currentWord.textContent = --i;
-    }
-    if (i < 2) {
+    currentWord.textContent = --i;
+    if (i === value) {
+        buttonBack.disabled = false;
+    } else if (i === 1) {
         buttonBack.disabled = true;
     }
-    if (i < 7) {
-        buttonNext.disabled = false;
-    }
     addWord();
+    buttonNext.disabled = false;
 });
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
 
+const shuffleBtn = document.querySelector('#shuffle-words');
+
+shuffleBtn.addEventListener("click", () => {
+    shuffleCards(words);
+    addWord();
+})
+
+function shuffleCards(array) {
+    let currentIndex = array.length,
+        randomIndex;
+    while (currentIndex != 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]
+        ];
+    }
+    return array;
+}
 
 const exam = document.querySelector('#exam');
 const examCards = document.querySelector("#exam-cards");
+const examTimer = document.querySelector("#time");
+let timer;
 
 exam.addEventListener("click", () => {
     flipCard.hidden = true;
@@ -111,6 +128,21 @@ exam.addEventListener("click", () => {
     cards.forEach(card => {
         card.style.order = getRandomInt(cards.length);
     });
+
+    timer = setInterval(() => {
+        let minutes = examTimer.textContent.split(":")[0];
+        let seconds = examTimer.textContent.split(":")[1];
+        seconds++;
+        if (seconds === 60) {
+            seconds = 0;
+            minutes++;
+        }
+        if (seconds < 10) {
+            examTimer.textContent = minutes + `:0` + seconds;
+        } else {
+            examTimer.textContent = minutes + `:` + seconds;
+        }
+    }, 1000)
 })
 
 function addExamCards() {
@@ -129,9 +161,22 @@ function addExamCards() {
     document.body.append(fragment);
 }
 
+const dictionary = {
+    "autumn": "осень",
+    "dream": "мечта",
+    "love": "любовь",
+    "home": "дом",
+    "travel": "путешествовать",
+    "food": "еда",
+    "music": "музыка",
+}
+
+const objLength = Object.keys(dictionary).length;
+
 let firstWord;
 let secondWord;
 let click = true;
+let counter = 0;
 
 examCards.addEventListener("click", function(event) {
     const target = event.target;
@@ -141,10 +186,17 @@ examCards.addEventListener("click", function(event) {
         firstWord.classList.add("correct");
     } else {
         secondWord = target;
-        if (words[firstWord.textContent] === secondWord.textContent || words[secondWord.textContent] === firstWord.textContent) {
+        if (dictionary[firstWord.textContent] === secondWord.textContent || dictionary[secondWord.textContent] === firstWord.textContent) {
             secondWord.classList.add("correct");
             firstWord.classList.add("fade-out");
             secondWord.classList.add("fade-out");
+            counter++;
+            setTimeout(() => {
+                if (counter === objLength) {
+                    clearInterval(timer);
+                    alert('Поздравляем! Вы успешно завершили проверку');
+                }
+            }, 500);
         } else {
             secondWord.classList.add("wrong");
             setTimeout(() => {
@@ -155,7 +207,3 @@ examCards.addEventListener("click", function(event) {
         click = true;
     }
 });
-
-// if () {
-// alert('Поздравляем! Вы успешно завершили проверку');
-// }
