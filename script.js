@@ -71,8 +71,8 @@ buttonNext.addEventListener("click", function() {
     if (i === value) {
         buttonNext.disabled = true;
     }
-    addWord();
     buttonBack.disabled = false;
+    addWord();
 })
 
 
@@ -83,8 +83,8 @@ buttonBack.addEventListener("click", function() {
     } else if (i === 1) {
         buttonBack.disabled = true;
     }
-    addWord();
     buttonNext.disabled = false;
+    addWord();
 });
 
 function getRandomInt(max) {
